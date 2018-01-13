@@ -1,6 +1,5 @@
 package com.gmail.vkhanh234.PickupMoney;
 
-import com.darkblade12.particleeffect.ParticleEffect;
 import com.gmail.vkhanh234.PickupMoney.Config.Blocks;
 import com.gmail.vkhanh234.PickupMoney.Config.Entities;
 import com.gmail.vkhanh234.PickupMoney.Config.Language;
@@ -9,6 +8,7 @@ import com.gmail.vkhanh234.PickupMoney.Listener.MultiplierListener;
 import com.gmail.vkhanh234.PickupMoney.Listener.MythicMobsListener;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
+import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,11 +16,13 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -46,7 +48,6 @@ public final class PickupMoney extends JavaPlugin implements Listener {
 	String version = getDescription().getVersion();
 	ConsoleCommandSender console = getServer().getConsoleSender();
 	private String prefix = "[PickupMoney] ";
-	private boolean preVer = false;
 	public List<UUID> spawners = new ArrayList<>();
 	public String regex="[0-9]+\\.[0-9]+";
 
@@ -54,46 +55,46 @@ public final class PickupMoney extends JavaPlugin implements Listener {
 		loadConfiguration();
 		initConfig();
 	}
-	 @Override
-	 public void onEnable() {
-		 if (fc.getBoolean("notiUpdate")) {
-			 sendConsole(ChatColor.GREEN + "Current version: " + ChatColor.AQUA + version);
-			 String vers = getNewestVersion();
-			 if (vers != null) {
-				 sendConsole(ChatColor.GREEN + "Latest version: " + ChatColor.RED + vers);
-				 if (!vers.equals(version)) {
-					 sendConsole(ChatColor.RED + "There is a new version on Spigot!");
-					 sendConsole(ChatColor.RED + "https://www.spigotmc.org/resources/11334/");
-				 }
-			 }
-		 }
-		 if(!getServer().getPluginManager().isPluginEnabled("Vault")){
-			 sendConsole("Vault is not installed or not enabled. ");
-			 sendConsole("This plugin will be disabled.");
-			 getServer().getPluginManager().disablePlugin(this);
-			 return;
-		 }
-		 String[] bukkver = getServer().getBukkitVersion().split("\\.");
-		 if(Integer.parseInt(bukkver[1].substring(0,1))<8){
-			 sendConsole("Server version is too old. Please update!");
-			 sendConsole("This plugin will be disabled.");
-			 getServer().getPluginManager().disablePlugin(this);
-			 return;
-		 }
-		 if (!setupEconomy() ) {
-			 getLogger().info(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
-			 getServer().getPluginManager().disablePlugin(this);
-			 return;
-		 }
-		 getServer().getPluginManager().registerEvents(new MainListener(this), this);
-		 getServer().getPluginManager().registerEvents(new MultiplierListener(this), this);
-		 loadMultipliers();
-		 try{
-			 Class.forName("net.elseland.xikage.MythicMobs.API.Bukkit.Events.MythicMobDeathEvent");
-			 getServer().getPluginManager().registerEvents(new MythicMobsListener(this), this);
-		 } catch (ClassNotFoundException e) {
-		 }
-	 }
+	@Override
+	public void onEnable() {
+		if (fc.getBoolean("notiUpdate")) {
+			sendConsole(ChatColor.GREEN + "Current version: " + ChatColor.AQUA + version);
+			String vers = getNewestVersion();
+			if (vers != null) {
+				sendConsole(ChatColor.GREEN + "Latest version: " + ChatColor.RED + vers);
+				if (!vers.equals(version)) {
+					sendConsole(ChatColor.RED + "There is a new version on Spigot!");
+					sendConsole(ChatColor.RED + "https://www.spigotmc.org/resources/11334/");
+				}
+			}
+		}
+		if(!getServer().getPluginManager().isPluginEnabled("Vault")){
+			sendConsole("Vault is not installed or not enabled. ");
+			sendConsole("This plugin will be disabled.");
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
+		String[] bukkver = getServer().getBukkitVersion().split("\\.");
+		if(Integer.parseInt(bukkver[1].substring(0,1))<8){
+			sendConsole("Server version is too old. Please update!");
+			sendConsole("This plugin will be disabled.");
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
+		if (!setupEconomy() ) {
+			getLogger().info(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
+		getServer().getPluginManager().registerEvents(new MainListener(this), this);
+		getServer().getPluginManager().registerEvents(new MultiplierListener(this), this);
+		loadMultipliers();
+		try{
+			Class.forName("net.elseland.xikage.MythicMobs.API.Bukkit.Events.MythicMobDeathEvent");
+			getServer().getPluginManager().registerEvents(new MythicMobsListener(this), this);
+		} catch (ClassNotFoundException e) {
+		}
+	}
 
 	private void loadMultipliers() {
 		for(Player p:getServer().getOnlinePlayers()){
@@ -103,7 +104,7 @@ public final class PickupMoney extends JavaPlugin implements Listener {
 
 	@Override
 	public void onDisable() {
-	        // TODO Insert logic to be performed when the plugin is disabled
+		// TODO Insert logic to be performed when the plugin is disabled
 	}
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -111,36 +112,36 @@ public final class PickupMoney extends JavaPlugin implements Listener {
 			sender.sendMessage(language.get("noPermission"));
 			return true;
 		}
-			if (args.length >= 1) {
-				try {
-					if (args[0].equals("reload") && sender.hasPermission("PickupMoney.admincmd")) {
-						reloadConfig();
-						initConfig();
-						sender.sendMessage(language.get("reload"));
+		if (args.length >= 1) {
+			try {
+				if (args[0].equals("reload") && sender.hasPermission("PickupMoney.admincmd")) {
+					reloadConfig();
+					initConfig();
+					sender.sendMessage(language.get("reload"));
+				}
+				else if (args[0].equals("drop") && sender instanceof Player && args.length == 2) {
+					Player p = (Player) sender;
+					float money = KUtils.getRandom(args[1]);
+					if(money<fc.getInt("minimumCmdDrop")){
+						p.sendMessage(language.get("miniumCmdDrop").replace("{money}",String.valueOf(fc.getInt("minimumCmdDrop"))));
+						return true;
 					}
-					else if (args[0].equals("drop") && sender instanceof Player && args.length == 2) {
-						Player p = (Player) sender;
-						float money = KUtils.getRandom(args[1]);
-						if(money<fc.getInt("minimumCmdDrop")){
-							p.sendMessage(language.get("miniumCmdDrop").replace("{money}",String.valueOf(fc.getInt("minimumCmdDrop"))));
-							return true;
-						}
-						Set<Material> set = null;
-						Block b = p.getTargetBlock(set, 6);
-						if (costMoney(money, p)) {
-							spawnMoney(p,money, b.getLocation());
-						} else {
-							p.sendMessage(language.get("noMoney"));
-						}
-					} else showHelp(sender);
-				}
-				catch (Exception e){
-					showHelp(sender);
-				}
+					Set<Material> set = null;
+					Block b = p.getTargetBlock(set, 6);
+					if (costMoney(money, p)) {
+						spawnMoney(p,money, b.getLocation());
+					} else {
+						p.sendMessage(language.get("noMoney"));
+					}
+				} else showHelp(sender);
 			}
-		else{
+			catch (Exception e){
 				showHelp(sender);
 			}
+		}
+		else{
+			showHelp(sender);
+		}
 		return true;
 	}
 	public void loadMultiplier(Player p){
@@ -195,15 +196,25 @@ public final class PickupMoney extends JavaPlugin implements Listener {
 	}
 	public void spawnMoney(Player p,float money,Location l){
 		if(dropMulti.containsKey(p.getUniqueId())) money*=dropMulti.get(p.getUniqueId());
+		for(Entity e : l.getWorld().getNearbyEntities(l, 5, 5, 5))
+			if(e instanceof Item) {
+				Item i = (Item) e;
+				if(i.hasMetadata("droppedMoney")){
+					Float m = Float.valueOf(i.getName().replaceAll("[^0-9.]", ""));
+					money = money + m;
+					e.remove();
+				}
+			}
 		Item item = l.getWorld().dropItemNaturally(l, getItem(Float.valueOf(money).intValue()));
 		String m = String.valueOf(money);
 		if (!m.contains(".")) m=m+".0";
 		item.setCustomName(language.get("nameSyntax").replace("{money}", m));
 		item.setCustomNameVisible(true);
+		item.setMetadata("droppedMoney", new FixedMetadataValue(this, true));
 	}
 	public void spawnParticle(Location l){
 		if (fc.getBoolean("particle.enable")) {
-			ParticleEffect.fromName(fc.getString("particle.type")).display((float) 0.5, (float) 0.5, (float) 0.5, 1, fc.getInt("particle.amount"), l, 20);
+			l.getWorld().playEffect(l, Effect.getByName(fc.getString("particle.type")), 10);
 		}
 	}
 	public boolean checkWorld(Location location) {
