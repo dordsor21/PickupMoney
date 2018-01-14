@@ -2,7 +2,7 @@ package com.gmail.vkhanh234.PickupMoney.Listener;
 
 import com.gmail.vkhanh234.PickupMoney.KUtils;
 import com.gmail.vkhanh234.PickupMoney.PickupMoney;
-import net.elseland.xikage.MythicMobs.API.Bukkit.Events.MythicMobDeathEvent;
+import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
