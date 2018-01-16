@@ -16,6 +16,8 @@ defaultFortuneBonus: 0
 defaultLootingBonus: 0
 #The amount of decimal numbers in the money
 decimalPlace: 2
+#The radius to collate dropped money when money is dropped
+collateRadius: 3
 #This mode will loop through all players and check entities near them to detect the money.
 #Use this mode to be able to pick money up even when inventory is full. But it can cause lag.
 #Need a full reload/restart when switch it. Dynamically reloading (Plugman) can cause trouble.

@@ -290,7 +290,8 @@ public final class PickupMoney extends JavaPlugin {
 		if ((p != null) && ((p instanceof Player)) && (this.dropMulti.containsKey(p.getUniqueId()))) {
 			money *= ((Integer)this.dropMulti.get(p.getUniqueId())).intValue();
 		}
-		for(Entity e : l.getWorld().getNearbyEntities(l, 5, 5, 5))
+		int r = fc.getInt("collateRadius");
+		for(Entity e : l.getWorld().getNearbyEntities(l, r, r, r))
 			if(e instanceof Item) {
 				Item i = (Item) e;
 				if(i.hasMetadata("droppedMoney")){
