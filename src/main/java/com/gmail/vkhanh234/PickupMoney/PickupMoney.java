@@ -296,7 +296,7 @@ public final class PickupMoney extends JavaPlugin {
 				Item i = (Item) e;
 				if(i.hasMetadata("droppedMoney")){
 					Float m = Float.valueOf(i.getName().replaceAll("[^0-9.]", ""));
-					money = money + m;
+					money = Float.sum(money, m);
 					e.remove();
 				}
 			}

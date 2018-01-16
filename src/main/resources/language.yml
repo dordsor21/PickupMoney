@@ -1,9 +1,9 @@
 # Put the message between 2 " so it will work with color code.
-pickup: "&aYou have received {money}$"
+pickup: "&aYou have received ${money}"
 reload: "&aPlugin has been reloaded!"
 noPermission: "&cYou don't have permission!"
-nameSyntax: "{money}$"
-dropOut: "&aYou have dropped {money}$"
+nameSyntax: "${money}"
+dropOut: "&aYou have dropped ${money}"
 noMoney: "&cYou don't have enough money"
 miniumCmdDrop: "&cThe minimum is {money}"
 clearLimit: "&aSuccessfully cleared the limit"
