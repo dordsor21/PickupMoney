@@ -1,9 +1,10 @@
 package com.gmail.vkhanh234.PickupMoney.Config;
 
-import com.gmail.vkhanh234.PickupMoney.KUtils;
 import com.gmail.vkhanh234.PickupMoney.PickupMoney;
 import java.io.File;
 import java.io.IOException;
+
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -55,6 +56,6 @@ public class Language {
 
 	public String get(String name)
 	{
-		return KUtils.convertColor(this.config.getString(name));
+		return ChatColor.translateAlternateColorCodes('&', this.config.getString(name));
 	}
 }
