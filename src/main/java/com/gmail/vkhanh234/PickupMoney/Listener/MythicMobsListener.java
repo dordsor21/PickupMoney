@@ -1,34 +1,51 @@
 package com.gmail.vkhanh234.PickupMoney.Listener;
 
+import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent;
+
 import com.gmail.vkhanh234.PickupMoney.KUtils;
 import com.gmail.vkhanh234.PickupMoney.PickupMoney;
-import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 public class MythicMobsListener implements Listener {
-    private final PickupMoney plugin;
 
-    public MythicMobsListener(PickupMoney plugin) {
-        this.plugin = plugin;
-    }
+	private final PickupMoney plugin;
 
-    @EventHandler
-    public void onMobsDeath(MythicMobDeathEvent e){
-        if(plugin.fc.getBoolean("enableEntitiesDrop")) {
-            if(e.getKiller()!=null && e.getKiller() instanceof Player) {
-                Entity entity = e.getEntity();
-                if (!plugin.checkWorld(entity.getLocation())) return;
-                String name = e.getMobType().getInternalName();
-                if (plugin.entities.contain(name) && plugin.entities.getEnable(name) && KUtils.getSuccess(plugin.entities.getChance(name))) {
-                    for (int i = 0; i < KUtils.getRandomInt(plugin.entities.getAmount(name)); i++) {
-                        plugin.spawnMoney((Player) e.getEntity(),KUtils.getRandom(plugin.entities.getMoney(name)), entity.getLocation());
-                    }
-                    plugin.spawnParticle(entity.getLocation());
-                }
-            }
-        }
-    }
+	public MythicMobsListener(PickupMoney plugin)
+	{
+		this.plugin = plugin;
+	}
+
+	@EventHandler
+	public void onMobsDeath(MythicMobDeathEvent e)
+	{
+		if (this.plugin.fc.getBoolean("enableEntitiesDrop"))
+		{
+			Entity entity = e.getEntity();
+			String name = e.getMobType().getInternalName();
+			if ((this.plugin.entities.isOnlyKill(name)) && ((e.getKiller() == null) || (!(e.getKiller() instanceof Player)))) {
+				return;
+			}
+			if (!this.plugin.checkWorld(entity.getLocation())) {
+				return;
+			}
+			if ((this.plugin.entities.contain(name)) && (this.plugin.entities.getEnable(name)) && (KUtils.getSuccess(this.plugin.entities.getChance(name))))
+			{
+				float bonus = this.plugin.entities.getLootingBonus(name);
+				int looting = 0;
+				if ((e.getKiller() instanceof Player)) {
+					looting = KUtils.getPlayerLooting((Player)e.getKiller());
+				}
+				for (int i = 0; i < KUtils.getRandomInt(this.plugin.entities.getAmount(name)); i++)
+				{
+					@SuppressWarnings("unused")
+					float money = this.plugin.getMoneyBonus(this.plugin.entities.getMoney(name), bonus, looting);
+					this.plugin.spawnMoney(e.getKiller(), this.plugin.getRandom(this.plugin.entities.getMoney(name)), entity.getLocation());
+				}
+				this.plugin.spawnParticle(entity.getLocation());
+			}
+		}
+	}
 }

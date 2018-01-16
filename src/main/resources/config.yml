@@ -1,17 +1,51 @@
 enableEntitiesDrop: true
 enableBlocksDrop: true
 notiUpdate: true
+#Shift to pick up money
+shiftToPickUp: false
+#Send message to action bar. Currently only for 1.9+. Tell me if you want to add for older version.
+actionBarMessage: true
+#Send message to chat
+chatMessage: true
+#Minimum amount of money for command drop
 minimumCmdDrop: 10
+#Percentage of the real money will be dropped if the mob is from spawner
 spawnerPercent: 50
+#Default value for Fortune and Looting bonus in case you didn't setted it manual
+defaultFortuneBonus: 0
+defaultLootingBonus: 0
+#The amount of decimal numbers in the money
+decimalPlace: 2
+#This mode will loop through all players and check entities near them to detect the money.
+#Use this mode to be able to pick money up even when inventory is full. But it can cause lag.
+#Need a full reload/restart when switch it. Dynamically reloading (Plugman) can cause trouble.
+scheduleMode:
+  enable: false
+  radius: 2
+  #Delay between each loop. The value is in tick. 20 ticks = 1 second
+  interval: 5
+#Should the plugin drop out the block that contain money with these conditions?
+dropBlock:
+  silkTouch: false
+  creative: false
+#Player can only obtain that amout of money in that amount of time.
+limit:
+  enable: false
+  #the value is in milisec
+  time: 86400000
+  amount: 20000
+#Particle when the money spawned.
 particle:
   enable: true
   type: happyVillager
   amount: 6
+#Sound when the money spawned.
 sound:
   enable: true
-  type: NOTE_PIANO
+  type: BLOCK_NOTE_PLING
   volumn: 2.0
   pitch: 1.0
+#The item type of the money.
 item:
   small:
     type: GOLD_NUGGET
@@ -23,4 +57,3 @@ item:
     type: GOLD_BLOCK
 disableWorld:
   - someworld
-#example perm: PickupMoney.multiply.donator for x2

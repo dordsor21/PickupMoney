@@ -1,0 +1,4 @@
+#You can stop the server and edit this time value to the value you want the plugin starting to count
+#Go here if you want a converter: http://www.epochconverter.com/
+#Remember, this value is in milisec.
+time: 0

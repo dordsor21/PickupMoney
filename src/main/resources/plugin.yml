@@ -1,8 +1,9 @@
 name: PickupMoney
 main: com.gmail.vkhanh234.PickupMoney.PickupMoney
 author: KickVN
-version: 1.6
-softdepend: [Vault]
+version: 2.5.2
+softdepend: [MythicMobs]
+depend: [Vault]
 commands:
    pickupmoney:
       description: Show PickupMoney's Command.
@@ -17,4 +18,7 @@ permissions:
         default: op
     PickupMoney.pickup:
         description: Allows you to pick up money.
-        default: op
+        default: true
+    PickupMoney.nolimit:
+        description: No limited money.
+        default: true

@@ -5,17 +5,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-/**
- * Created by Admin on 6/9/2015.
- */
-public class MultiplierListener implements Listener{
-    private final PickupMoney plugin;
-    public MultiplierListener(PickupMoney plugin) {
-        this.plugin = plugin;
-    }
+public class MultiplierListener implements Listener {
 
-    @EventHandler
-    public void onLogin(PlayerJoinEvent e){
-        plugin.loadMultiplier(e.getPlayer());
-    }
+	private final PickupMoney plugin;
+
+	public MultiplierListener(PickupMoney plugin)
+	{
+		this.plugin = plugin;
+	}
+
+	@EventHandler
+	public void onLogin(PlayerJoinEvent e)
+	{
+		this.plugin.loadMultiplier(e.getPlayer());
+	}
 }

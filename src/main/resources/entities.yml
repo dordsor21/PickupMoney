@@ -1,6 +1,6 @@
 CHICKEN:
   enable: true
-  money: 1-5
+  money: 0.1-0.5
   amount: 1-2
   chance: 100
 ZOMBIE:
@@ -8,12 +8,14 @@ ZOMBIE:
   money: 10-20
   amount: 2-3
   chance: 100
+  lootingBonus: 1
 PLAYER:
   enable: true
   money: 10%
   amount: 1
   chance: 100
   cost: true
+  onlyKill: true
 #MythicMobs
 SkeletalMinion:
   enable: true
