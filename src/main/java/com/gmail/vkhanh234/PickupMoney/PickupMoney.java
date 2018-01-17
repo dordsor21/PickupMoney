@@ -389,7 +389,7 @@ public final class PickupMoney extends JavaPlugin {
 
 	public String getMessage(String type)
 	{
-		return KUtils.convertColor(this.fc.getString("Message." + type));
+		return ChatColor.translateAlternateColorCodes('&', this.fc.getString("Message." + type));
 	}
 
 	private String getNewestVersion()
