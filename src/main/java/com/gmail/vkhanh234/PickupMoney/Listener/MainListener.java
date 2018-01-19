@@ -76,21 +76,19 @@ public class MainListener implements Listener {
 					for (int i = 0; i < KUtils.getRandomInt(this.plugin.entities.getAmount(name)); i++)
 					{
 						float money = this.plugin.getMoneyBonus(this.plugin.entities.getMoney(name), bonus, looting);
+						if (e.getEntity().getType().equals(EntityType.ZOMBIE)){
+							Zombie zombie = (Zombie)e.getEntity();
+							Float zMoney = KUtils.getMoneyFromItem(zombie.getEquipment().getItemInHand());
+							if (zMoney != 0.0F){
+								money += zMoney;
+								e.getDrops().remove(zombie.getEquipment().getItemInHand());
+								zombie.getEquipment().setItemInHand(new ItemStack(Material.AIR));
+							}
+						}
 						this.plugin.spawnMoney(e.getEntity().getKiller(), money * perc / 100.0F, entity.getLocation());
 					}
 				}
 				this.plugin.spawnParticle(entity.getLocation());
-			}
-		}
-		if (e.getEntity().getType().equals(EntityType.ZOMBIE))
-		{
-			Zombie zombie = (Zombie)e.getEntity();
-			float money = KUtils.getMoneyFromItem(zombie.getEquipment().getItemInHand());
-			if (money != 0.0F)
-			{
-				this.plugin.spawnMoney(e.getEntity().getKiller(), money, e.getEntity().getLocation());
-				e.getDrops().remove(zombie.getEquipment().getItemInHand());
-				zombie.getEquipment().setItemInHand(new ItemStack(Material.AIR));
 			}
 		}
 	}
