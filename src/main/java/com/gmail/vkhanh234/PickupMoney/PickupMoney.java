@@ -295,7 +295,7 @@ public final class PickupMoney extends JavaPlugin {
 			if(e instanceof Item) {
 				Item i = (Item) e;
 				if(i.hasMetadata("droppedMoney")){
-					Float m = Float.valueOf(e.getCustomName().replaceAll("[^0-9.]", ""));
+					Float m = Float.valueOf(stripCodes(e.getCustomName()).replaceAll("[^0-9.]", ""));
 					money = Float.sum(money, m);
 					e.removeMetadata("droppedMoney", this);
 					e.remove();
@@ -487,5 +487,30 @@ public final class PickupMoney extends JavaPlugin {
 	{
 		Random random = new Random();
 		return (maxX - minX) * random.nextFloat() + minX;
+	}
+
+	private String stripCodes(String m){
+		return m
+				.replace("&0", "")
+				.replace("&1", "")
+				.replace("&2", "")
+				.replace("&3", "")
+				.replace("&4", "")
+				.replace("&5", "")
+				.replace("&6", "")
+				.replace("&7", "")
+				.replace("&8", "")
+				.replace("&9", "")
+				.replace("&a", "")
+				.replace("&b", "")
+				.replace("&c", "")
+				.replace("&d", "")
+				.replace("&e", "")
+				.replace("&f", "")
+				.replace("&k", "")
+				.replace("&l", "")
+				.replace("&m", "")
+				.replace("&n", "")
+				.replace("&o", "");
 	}
 }
