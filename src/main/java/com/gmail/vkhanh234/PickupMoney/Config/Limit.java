@@ -13,79 +13,56 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public class Limit {
 
 	private FileConfiguration config;
-	private File configFile = new File("plugins/PickupMoney/limit.yml");
+	private File configFile;
 	HashMap<String, Float> map = new HashMap<String, Float>();
 	private final PickupMoney plugin;
 	private long time = 0L;
 	private long limitTime = 0L;
 	private int limitAmount = 0;
 
-	public Limit(PickupMoney plugin)
-	{
+	public Limit(PickupMoney plugin) {
 		this.plugin = plugin;
-		this.limitTime = plugin.fc.getLong("limit.time");
-		this.limitAmount = plugin.fc.getInt("limit.amount");
-		this.config = YamlConfiguration.loadConfiguration(this.configFile);
-		try
-		{
-			update();
-		}
-		catch (IOException e)
-		{
+		limitTime = plugin.fc.getLong("limit.time");
+		limitAmount = plugin.fc.getInt("limit.amount");
+
+		try {
+			configFile = new File(plugin.getDataFolder(), "language.yml");
+
+			if(!configFile.exists()) {
+				configFile.getParentFile().mkdirs();
+				plugin.saveResource("language.yml", false);
+			}
+
+			config = new YamlConfiguration();
+			config.load(configFile);
+
+			time = config.getLong("time");
+			ConfigurationSection cs = config.getConfigurationSection("list");
+			if (cs == null)
+				return;
+			for (String k : cs.getKeys(false))
+				map.put(k, Float.valueOf(cs.getString(k)));
+
+		} catch (IOException | InvalidConfigurationException e) {
 			e.printStackTrace();
 		}
-		catch (InvalidConfigurationException e)
-		{
-			e.printStackTrace();
-		}
-		load();
+
 	}
 
-	@SuppressWarnings("deprecation")
-	public void update()
-			throws IOException, InvalidConfigurationException
-	{
-		if (!this.configFile.exists())
-		{
-			this.config.load(this.plugin.getResource("limit.yml"));
-			this.config.save(this.configFile);
-		}
-	}
-
-	public void load()
-	{
-		this.time = this.config.getLong("time");
-		ConfigurationSection cs = this.config.getConfigurationSection("list");
-		if (cs == null) {
-			return;
-		}
-		for (String k : cs.getKeys(false)) {
-			this.map.put(k, Float.valueOf(cs.getString(k)));
-		}
-	}
-
-	public boolean add(final String name, float amount)
-	{
+	public boolean add(final String name, float amount) {
 		checkTime();
-		if (!this.map.containsKey(name)) {
-			this.map.put(name, Float.valueOf(0.0F));
-		}
-		final float newamount = ((Float)this.map.get(name)).floatValue() + amount;
-		if (newamount > this.limitAmount) {
+		if (!map.containsKey(name))
+			map.put(name, Float.valueOf(0.0F));
+		final float newamount = ((Float)map.get(name)).floatValue() + amount;
+		if (newamount > limitAmount)
 			return false;
-		}
-		this.map.put(name, Float.valueOf(newamount));
-		Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable()
-		{
-			public void run()
-			{
-				Limit.this.config.set("list." + name, Float.valueOf(newamount));
-				try
-				{
-					Limit.this.config.save(Limit.this.configFile);
-				}
-				catch (IOException e)
-				{
+		map.put(name, Float.valueOf(newamount));
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
+			public void run() {
+				config.set("list." + name, Float.valueOf(newamount));
+				try {
+					config.save(configFile);
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -93,55 +70,40 @@ public class Limit {
 		return true;
 	}
 
-	private void checkTime()
-	{
-		if (this.time + this.limitTime < System.currentTimeMillis()) {
+	private void checkTime() {
+		if (time + limitTime < System.currentTimeMillis())
 			clear();
-		}
 	}
 
-	public void clear()
-	{
-		this.map.clear();
-		this.config.createSection("list");
+	public void clear() {
+		map.clear();
+		config.createSection("list");
 		updateTime();
 	}
 
-	public void clearPlayer(final String name)
-	{
-		this.map.put(name, Float.valueOf(0.0F));
-		Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable()
-		{
-			public void run()
-			{
-				Limit.this.config.set("list." + name, Float.valueOf(0.0F));
-				try
-				{
-					Limit.this.config.save(Limit.this.configFile);
-				}
-				catch (IOException e)
-				{
+	public void clearPlayer(final String name) {
+		map.put(name, Float.valueOf(0.0F));
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
+			public void run() {
+				config.set("list." + name, Float.valueOf(0.0F));
+				try {
+					config.save(configFile);
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		});
 	}
 
-	private void updateTime()
-	{
-		long t = (System.currentTimeMillis() - this.time) / this.limitTime;
-		this.time += (t + 1L) * this.limitTime;
-		Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable()
-		{
-			public void run()
-			{
-				Limit.this.config.set("time", Long.valueOf(Limit.this.time));
-				try
-				{
-					Limit.this.config.save(Limit.this.configFile);
-				}
-				catch (IOException e)
-				{
+	private void updateTime() {
+		long t = (System.currentTimeMillis() - time) / limitTime;
+		time += (t + 1L) * limitTime;
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
+			public void run() {
+				config.set("time", Long.valueOf(time));
+				try {
+					config.save(configFile);
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}

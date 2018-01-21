@@ -12,50 +12,26 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public class Language {
 
 	private FileConfiguration config;
-	private File configFile = new File("plugins/PickupMoney/language.yml");
-	private final PickupMoney plugin;
+	private File configFile;
 
-	public Language(PickupMoney plugin)
-	{
-		this.plugin = plugin;
-		this.config = YamlConfiguration.loadConfiguration(this.configFile);
-		try
-		{
-			update();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		catch (InvalidConfigurationException e)
-		{
-			e.printStackTrace();
-		}
-	}
+	public Language(PickupMoney plugin) {
 
-	@SuppressWarnings("deprecation")
-	public void update()
-			throws IOException, InvalidConfigurationException
-	{
-		if (!this.configFile.exists())
-		{
-			this.config.load(this.plugin.getResource("language.yml"));
-			this.config.save(this.configFile);
-		}
-		else
-		{
-			FileConfiguration c = YamlConfiguration.loadConfiguration(this.plugin.getResource("language.yml"));
-			for (String k : c.getKeys(true)) {
-				if (!this.config.contains(k)) {
-					this.config.set(k, c.get(k));
-				}
+		try {
+			configFile = new File(plugin.getDataFolder(), "language.yml");
+
+			if(!configFile.exists()) {
+				configFile.getParentFile().mkdirs();
+				plugin.saveResource("language.yml", false);
 			}
-			this.config.save(this.configFile);
+
+			config = new YamlConfiguration();
+			config.load(configFile);
+		} catch (IOException | InvalidConfigurationException e) {
+			e.printStackTrace();
 		}
 	}
 
-	public String get(String name)
-	{
-		return ChatColor.translateAlternateColorCodes('&', this.config.getString(name));
+	public String get(String name) {
+		return ChatColor.translateAlternateColorCodes('&', config.getString(name));
 	}
 }

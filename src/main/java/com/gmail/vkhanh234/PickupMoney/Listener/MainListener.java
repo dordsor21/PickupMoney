@@ -78,11 +78,11 @@ public class MainListener implements Listener {
 						float money = this.plugin.getMoneyBonus(this.plugin.entities.getMoney(name), bonus, looting);
 						if (e.getEntity().getType().equals(EntityType.ZOMBIE)){
 							Zombie zombie = (Zombie)e.getEntity();
-							Float zMoney = plugin.round(KUtils.getMoneyFromItem(zombie.getEquipment().getItemInHand()));
+							Float zMoney = plugin.round(KUtils.getMoneyFromItem(zombie.getEquipment().getItemInMainHand()));
 							if (zMoney != 0.0F){
 								money += zMoney;
-								e.getDrops().remove(zombie.getEquipment().getItemInHand());
-								zombie.getEquipment().setItemInHand(new ItemStack(Material.AIR));
+								e.getDrops().remove(zombie.getEquipment().getItemInMainHand());
+								zombie.getEquipment().setItemInMainHand(new ItemStack(Material.AIR));
 							}
 						}
 						this.plugin.spawnMoney(e.getEntity().getKiller(), money * perc / 100.0F, entity.getLocation());
@@ -126,7 +126,7 @@ public class MainListener implements Listener {
 
 	private boolean hasSilkTorch(Player player)
 	{
-		return player.getItemInHand().getEnchantmentLevel(Enchantment.SILK_TOUCH) > 0;
+		return player.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.SILK_TOUCH) > 0;
 	}
 
 	@EventHandler

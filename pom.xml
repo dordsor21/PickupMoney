@@ -31,31 +31,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.11.2-R0.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
-			<version>1.8.8-R0.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
-			<version>1.10-R0.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
-			<version>1.9.4-R0.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
-			<version>1.9.2-R0.1-SNAPSHOT</version>
+			<version>1.12.2-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -63,34 +39,6 @@
 			<artifactId>VaultAPI</artifactId>
 			<version>1.6</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>craftbukkit</groupId>
-			<artifactId>craftbukkit1.11</artifactId>
-			<version>1.11</version>
-            <systemPath>${project.basedir}/lib/craftbukkit-1.11.jar</systemPath>
-			<scope>system</scope>
-		</dependency>
-		<dependency>
-			<groupId>craftbukkit</groupId>
-			<artifactId>craftbukkit1.10.2</artifactId>
-			<version>1.10.2</version>
-            <systemPath>${project.basedir}/lib/craftbukkit-1.10.2.jar</systemPath>
-			<scope>system</scope>
-		</dependency>
-		<dependency>
-			<groupId>craftbukkit</groupId>
-			<artifactId>craftbukkit1.9.4</artifactId>
-			<version>1.9.4</version>
-			<scope>system</scope>
-            <systemPath>${project.basedir}/lib/craftbukkit-1.9.4.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>craftbukkit</groupId>
-			<artifactId>craftbukkit1.9.2</artifactId>
-			<version>1.9.2</version>
-			<scope>system</scope>
-            <systemPath>${project.basedir}/lib/craftbukkit-1.9.2.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>MythicMobs</groupId>

@@ -11,101 +11,76 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public class Blocks {
 
 	private FileConfiguration config;
-	private File configFile = new File("plugins/PickupMoney/blocks.yml");
+	private File configFile;
 	HashMap<String, BlockDat> map = new HashMap<String, BlockDat>();
-	private final PickupMoney plugin;
 
-	public Blocks(PickupMoney plugin)
-	{
-		this.plugin = plugin;
-		this.config = YamlConfiguration.loadConfiguration(this.configFile);
-		try
-		{
-			update();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		catch (InvalidConfigurationException e)
-		{
-			e.printStackTrace();
-		}
-		load();
-	}
+	public Blocks(PickupMoney plugin) {
 
-	@SuppressWarnings("deprecation")
-	public void update()
-			throws IOException, InvalidConfigurationException
-	{
-		if (!this.configFile.exists())
-		{
-			this.config.load(this.plugin.getResource("blocks.yml"));
-			this.config.save(this.configFile);
-		}
-	}
+		try {
+			configFile = new File(plugin.getDataFolder(), "blocks.yml");
 
-	public void load()
-	{
-		for (String k : this.config.getKeys(false))
-		{
-			BlockDat e = new BlockDat();
-			e.enable = this.config.getBoolean(k + ".enable");
-			e.chance = this.config.getInt(k + ".chance");
-			e.money = this.config.getString(k + ".money");
-			e.amount = this.config.getString(k + ".amount");
-			e.dropBlock = this.config.getBoolean(k + ".dropBlock");
-			if (this.config.contains(k + ".fortuneBonus")) {
-				e.fortuneBonus = Float.valueOf(this.config.getString(k + ".fortuneBonus")).floatValue();
-			} else {
-				e.fortuneBonus = Float.valueOf(this.plugin.fc.getString("defaultFortuneBonus")).floatValue();
+			if(!configFile.exists()) {
+				configFile.getParentFile().mkdirs();
+				plugin.saveResource("blocks.yml", false);
 			}
-			this.map.put(k, e);
+
+			config = new YamlConfiguration();
+			config.load(configFile);
+
+			for (String k : config.getKeys(false)) {
+				BlockDat e = new BlockDat();
+				e.enable = config.getBoolean(k + ".enable");
+				e.chance = config.getInt(k + ".chance");
+				e.money = config.getString(k + ".money");
+				e.amount = config.getString(k + ".amount");
+				e.dropBlock = config.getBoolean(k + ".dropBlock");
+				if (config.contains(k + ".fortuneBonus"))
+					e.fortuneBonus = Float.valueOf(config.getString(k + ".fortuneBonus")).floatValue();
+				else
+					e.fortuneBonus = Float.valueOf(plugin.fc.getString("defaultFortuneBonus")).floatValue();
+				map.put(k, e);
+			}
+
+		} catch (IOException | InvalidConfigurationException e) {
+			e.printStackTrace();
 		}
+
 	}
 
-	public boolean contain(String name)
-	{
-		return this.map.containsKey(name);
+	public boolean contain(String name) {
+		return map.containsKey(name);
 	}
 
-	public boolean getDropBlock(String name)
-	{
-		return ((BlockDat)this.map.get(name)).dropBlock;
+	public boolean getDropBlock(String name) {
+		return ((BlockDat)map.get(name)).dropBlock;
 	}
 
-	public boolean getEnable(String name)
-	{
-		return ((BlockDat)this.map.get(name)).enable;
+	public boolean getEnable(String name) {
+		return ((BlockDat)map.get(name)).enable;
 	}
 
-	public int getChance(String name)
-	{
-		return ((BlockDat)this.map.get(name)).chance;
+	public int getChance(String name) {
+		return ((BlockDat)map.get(name)).chance;
 	}
 
 	public String getMoney(String name)
 	{
-		return ((BlockDat)this.map.get(name)).money;
+		return ((BlockDat)map.get(name)).money;
 	}
 
-	public String getAmount(String name)
-	{
-		return ((BlockDat)this.map.get(name)).amount;
+	public String getAmount(String name) {
+		return ((BlockDat)map.get(name)).amount;
 	}
 
-	public BlockDat getBlockDat(String name)
-	{
-		return (BlockDat)this.map.get(name);
+	public BlockDat getBlockDat(String name) {
+		return (BlockDat)map.get(name);
 	}
 
-	public float getFortuneBonus(String name)
-	{
-		return ((BlockDat)this.map.get(name)).fortuneBonus;
+	public float getFortuneBonus(String name) {
+		return ((BlockDat)map.get(name)).fortuneBonus;
 	}
 
-	class BlockDat
-	{
+	class BlockDat {
 		boolean enable;
 		boolean dropBlock;
 		int chance;

@@ -1,6 +1,5 @@
 package com.gmail.vkhanh234.PickupMoney;
 
-import com.gmail.vkhanh234.PickupMoney.ActionBar.ActionBar;
 import com.gmail.vkhanh234.PickupMoney.Config.Blocks;
 import com.gmail.vkhanh234.PickupMoney.Config.Entities;
 import com.gmail.vkhanh234.PickupMoney.Config.Language;
@@ -9,15 +8,8 @@ import com.gmail.vkhanh234.PickupMoney.Listener.MainListener;
 import com.gmail.vkhanh234.PickupMoney.Listener.MultiplierListener;
 import com.gmail.vkhanh234.PickupMoney.Listener.MythicMobsListener;
 import com.gmail.vkhanh234.PickupMoney.Listener.PickupListener;
-import com.darkblade12.particleeffect.ParticleEffect;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,33 +46,15 @@ public final class PickupMoney extends JavaPlugin {
 	public HashMap<UUID, Integer> pickupMulti = new HashMap<UUID, Integer>();
 	public Blocks blocks;
 	public Limit limit;
-	public int svVer;
-	String version = getDescription().getVersion();
 	ConsoleCommandSender console;
 	private String prefix = "[PickupMoney] ";
 	public List<UUID> spawners = new ArrayList<UUID>();
-	public ActionBar actionBar;
-	private String svVersion;
 
 	public void onEnable()
 	{
 		this.console = getServer().getConsoleSender();
 		loadConfiguration();
 		initConfig();
-		if (this.fc.getBoolean("notiUpdate"))
-		{
-			sendConsole(ChatColor.GREEN + "Current version: " + ChatColor.AQUA + this.version);
-			String vers = getNewestVersion();
-			if (vers != null)
-			{
-				sendConsole(ChatColor.GREEN + "Latest version: " + ChatColor.RED + vers);
-				if (!vers.equals(this.version))
-				{
-					sendConsole(ChatColor.RED + "There is a new version on Spigot!");
-					sendConsole(ChatColor.RED + "https://www.spigotmc.org/resources/11334/");
-				}
-			}
-		}
 		if (!setupEconomy())
 		{
 			getLogger().info(String.format("[%s] - Disabled due to no Vault dependency found!", new Object[] { getDescription().getName() }));
@@ -102,19 +76,6 @@ public final class PickupMoney extends JavaPlugin {
 			getServer().getPluginManager().registerEvents(new MythicMobsListener(this), this);
 		}
 		catch (ClassNotFoundException localClassNotFoundException) {}
-		String packageName = getServer().getClass().getPackage().getName();
-		this.svVersion = packageName.substring(packageName.lastIndexOf('.') + 1);
-		try
-		{
-			Class<?> clazz = Class.forName("com.gmail.vkhanh234.PickupMoney.ActionBar.ActionBar_" + this.svVersion);
-			if (ActionBar.class.isAssignableFrom(clazz)) {
-				this.actionBar = ((ActionBar)clazz.getConstructor(new Class[0]).newInstance(new Object[0]));
-			}
-		}
-		catch (Exception e)
-		{
-			getLogger().info("Not support ActionBar in this Spigot version. Contact me if you want to add.");
-		}
 	}
 
 	private void loadMultipliers()
@@ -214,7 +175,7 @@ public final class PickupMoney extends JavaPlugin {
 
 	private void showHelp(CommandSender sender)
 	{
-		sender.sendMessage(ChatColor.RED + "PickupMoney version " + this.version);
+		sender.sendMessage(ChatColor.RED + "PickupMoney");
 		if (sender.hasPermission("PickupMoney.admincmd"))
 		{
 			sender.sendMessage(ChatColor.GREEN + "Reload - " + ChatColor.AQUA + "/pickupmoney reload");
@@ -319,13 +280,7 @@ public final class PickupMoney extends JavaPlugin {
 
 	public void spawnParticle(Location l)
 	{
-		if (this.fc.getBoolean("particle.enable")) {
-			if ((this.svVersion.equals("v1_10_R1")) || (this.svVersion.equals("v1_11_R1"))) {
-				l.getWorld().spigot().playEffect(l, Effect.getByName(this.fc.getString("particle.type")), 0, 0, 0.5F, 0.5F, 0.5F, 1.0F, this.fc.getInt("particle.amount"), 20);
-			} else {
-				ParticleEffect.fromName(this.fc.getString("particle.type")).display(0.5F, 0.5F, 0.5F, 1.0F, this.fc.getInt("particle.amount"), l, 20.0D);
-			}
-		}
+		l.getWorld().playEffect(l, Effect.valueOf(this.fc.getString("particle.type")), this.fc.getInt("particle.amount"), 20);
 	}
 
 	public boolean checkWorld(Location location)
@@ -393,52 +348,6 @@ public final class PickupMoney extends JavaPlugin {
 		return ChatColor.translateAlternateColorCodes('&', this.fc.getString("Message." + type));
 	}
 
-	private String getNewestVersion()
-	{
-		try
-		{
-			URL url = new URL("https://dl.dropboxusercontent.com/s/a890l19kn0fv32l/PickupMoney.txt");
-			URLConnection con = url.openConnection();
-			con.setConnectTimeout(2000);
-			con.setReadTimeout(1000);
-			InputStream in = con.getInputStream();
-			return getStringFromInputStream(in);
-		}
-		catch (IOException ex)
-		{
-			sendConsole(ChatColor.RED + "Failed to check for update!");
-		}
-		return null;
-	}
-
-	private static String getStringFromInputStream(InputStream is){
-		BufferedReader br = null;
-		StringBuilder sb = new StringBuilder();
-		try{
-			br = new BufferedReader(new InputStreamReader(is));
-			String line;
-			while ((line = br.readLine()) != null) {
-				sb.append(line);
-			}
-			return sb.toString();
-		}
-		catch (IOException e){
-			e.printStackTrace();
-			return null;
-		}finally{
-			if (br != null) {
-				try
-				{
-					br.close();
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
 	public void sendMessage(CommandSender p, String s)
 	{
 		if ((s == null) || (s.equals(""))) {
@@ -446,9 +355,6 @@ public final class PickupMoney extends JavaPlugin {
 		}
 		if (this.fc.getBoolean("chatMessage")) {
 			p.sendMessage(s);
-		}
-		if (((p instanceof Player)) && (this.actionBar != null) && (this.fc.getBoolean("actionBarMessage"))) {
-			this.actionBar.send((Player)p, s);
 		}
 	}
 

@@ -27,16 +27,14 @@ public class KUtils {
 		return 0.0F;
 	}
 
-	@SuppressWarnings("deprecation")
 	public static int getPlayerFortune(Player p)
 	{
-		return p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
+		return p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static int getPlayerLooting(Player p)
 	{
-		return p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS);
+		return p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS);
 	}
 
 	public static int getRandomInt(String level)
