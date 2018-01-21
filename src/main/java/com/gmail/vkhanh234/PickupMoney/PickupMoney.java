@@ -28,6 +28,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -50,92 +51,68 @@ public final class PickupMoney extends JavaPlugin {
 	private String prefix = "[PickupMoney] ";
 	public List<UUID> spawners = new ArrayList<UUID>();
 
-	public void onEnable()
-	{
-		this.console = getServer().getConsoleSender();
+	public void onEnable() {
+		console = getServer().getConsoleSender();
 		loadConfiguration();
 		initConfig();
-		if (!setupEconomy())
-		{
+		if (!setupEconomy()) {
 			getLogger().info(String.format("[%s] - Disabled due to no Vault dependency found!", new Object[] { getDescription().getName() }));
 			getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
 		getServer().getPluginManager().registerEvents(new MainListener(this), this);
 		getServer().getPluginManager().registerEvents(new MultiplierListener(this), this);
-		if (this.fc.getBoolean("scheduleMode.enable"))
-		{
+		if (fc.getBoolean("scheduleMode.enable")) {
 			PickupRunnable runnable = new PickupRunnable(this);
-			runnable.runTaskTimer(this, this.fc.getInt("scheduleMode.interval"), this.fc.getInt("scheduleMode.interval"));
+			runnable.runTaskTimer(this, fc.getInt("scheduleMode.interval"), fc.getInt("scheduleMode.interval"));
 		}
 		getServer().getPluginManager().registerEvents(new PickupListener(this), this);
 		loadMultipliers();
-		try
-		{
+		try {
 			Class.forName("net.elseland.xikage.MythicMobs.API.Bukkit.Events.MythicMobDeathEvent");
 			getServer().getPluginManager().registerEvents(new MythicMobsListener(this), this);
-		}
-		catch (ClassNotFoundException localClassNotFoundException) {}
+		} catch (ClassNotFoundException localClassNotFoundException) {}
 	}
 
-	private void loadMultipliers()
-	{
-		for (Player p : getServer().getOnlinePlayers()) {
+	private void loadMultipliers() {
+		for (Player p : getServer().getOnlinePlayers())
 			loadMultiplier(p);
-		}
 	}
 
-	public void onDisable() {}
-
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
-	{
-		if (!sender.hasPermission("PickupMoney.command"))
-		{
-			sendMessage(sender, this.language.get("noPermission"));
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		if (!sender.hasPermission("PickupMoney.command")) {
+			sendMessage(sender, language.get("noPermission"));
 			return true;
 		}
 		if (args.length >= 1) {
-			try
-			{
-				if ((args[0].equals("reload")) && (sender.hasPermission("PickupMoney.admincmd")))
-				{
+			try {
+				if ((args[0].equals("reload")) && (sender.hasPermission("PickupMoney.admincmd"))) {
 					reloadConfig();
 					initConfig();
-					sendMessage(sender, this.language.get("reload"));
-				}
-				else if ((args[0].equals("drop")) && ((sender instanceof Player)) && (args.length == 2))
-				{
+					sendMessage(sender, language.get("reload"));
+				} else if ((args[0].equals("drop")) && ((sender instanceof Player)) && (args.length == 2)) {
 					Player p = (Player)sender;
 					float money = getRandom(args[1]);
-					if (money < this.fc.getInt("minimumCmdDrop"))
-					{
-						sendMessage(p, this.language.get("miniumCmdDrop").replace("{money}", String.valueOf(this.fc.getInt("minimumCmdDrop"))));
+					if (money < fc.getInt("minimumCmdDrop")) {
+						sendMessage(p, language.get("miniumCmdDrop").replace("{money}", String.valueOf(fc.getInt("minimumCmdDrop"))));
 						return true;
 					}
 					Set<Material> set = null;
 					Block b = p.getTargetBlock(set, 6);
-					if (costMoney(money, p)) {
-						spawnMoney(p, money, b.getLocation());
-					} else {
-						sendMessage(p, this.language.get("noMoney"));
-					}
-				}
-				else if ((args[0].equals("clearlimit")) && (args.length == 2) && (sender.hasPermission("PickupMoney.admincmd")))
-				{
-					if (args[1].equals("all")) {
-						this.limit.clear();
-					} else {
-						this.limit.clearPlayer(args[1]);
-					}
-					sendMessage(sender, this.language.get("clearLimit"));
-				}
-				else
-				{
+					if (costMoney(money, p))
+						spawnMoney(p, money, b.getLocation());else
+							sendMessage(p, language.get("noMoney"));
+				} else if ((args[0].equals("clearlimit")) && (args.length == 2) && (sender.hasPermission("PickupMoney.admincmd"))) {
+					if (args[1].equals("all"))
+						limit.clear();
+					else
+						limit.clearPlayer(args[1]);
+					sendMessage(sender, language.get("clearLimit"));
+				} else {
 					showHelp(sender);
 				}
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				showHelp(sender);
 			}
 		}
@@ -144,50 +121,40 @@ public final class PickupMoney extends JavaPlugin {
 		return true;
 	}
 
-	public void loadMultiplier(Player p)
-	{
+	public void loadMultiplier(Player p) {
 		int id = 1;int ip = 1;
-		for (PermissionAttachmentInfo perms : p.getEffectivePermissions())
-		{
+		for (PermissionAttachmentInfo perms : p.getEffectivePermissions()) {
 			String perm = perms.getPermission();
-			if (perm.toLowerCase().startsWith("pickupmoney.multiply."))
-			{
+			if (perm.toLowerCase().startsWith("pickupmoney.multiply.")) {
 				String[] spl = perm.split("\\.");
-				if (spl[3].matches("\\d+"))
-				{
+				if (spl[3].matches("\\d+")) {
 					int num = Integer.parseInt(spl[3]);
-					if ((spl[2].equals("drop")) && (id < num)) {
+					if ((spl[2].equals("drop")) && (id < num))
 						id = num;
-					} else if ((spl[2].equals("pickup")) && (ip < num)) {
+					else if ((spl[2].equals("pickup")) && (ip < num))
 						ip = num;
-					}
 				}
 			}
 		}
-		this.dropMulti.put(p.getUniqueId(), Integer.valueOf(id));
-		this.pickupMulti.put(p.getUniqueId(), Integer.valueOf(ip));
+		dropMulti.put(p.getUniqueId(), Integer.valueOf(id));
+		pickupMulti.put(p.getUniqueId(), Integer.valueOf(ip));
 	}
 
-	public void sendConsole(String s)
-	{
-		this.console.sendMessage(this.prefix + s);
+	public void sendConsole(String s) {
+		console.sendMessage(prefix + s);
 	}
 
-	private void showHelp(CommandSender sender)
-	{
+	private void showHelp(CommandSender sender) {
 		sender.sendMessage(ChatColor.RED + "PickupMoney");
-		if (sender.hasPermission("PickupMoney.admincmd"))
-		{
+		if (sender.hasPermission("PickupMoney.admincmd")) {
 			sender.sendMessage(ChatColor.GREEN + "Reload - " + ChatColor.AQUA + "/pickupmoney reload");
 			sender.sendMessage(ChatColor.GREEN + "Clear limit - " + ChatColor.AQUA + "/pickupmoney clearlimit <all/player_name>");
 		}
 		sender.sendMessage(ChatColor.GREEN + "Drop Money - " + ChatColor.AQUA + "/pickupmoney drop <amount>");
 	}
 
-	public float getMoneyOfPlayer(Player p, String val)
-	{
-		if (val.contains("%"))
-		{
+	public float getMoneyOfPlayer(Player p, String val) {
+		if (val.contains("%")) {
 			String s = val.replace("%", "");
 			int percent = KUtils.getRandomInt(s);
 			return Double.valueOf(economy.getBalance(p)).floatValue() * percent / 100.0F;
@@ -195,68 +162,56 @@ public final class PickupMoney extends JavaPlugin {
 		return getRandom(val);
 	}
 
-	public String getMoney(String name)
-	{
-		String[] spl = ChatColor.stripColor(this.language.get("nameSyntax")).split("\\{money\\}");
+	public String getMoney(String name) {
+		String[] spl = ChatColor.stripColor(language.get("nameSyntax")).split("\\{money\\}");
 		String t = name;
-		for (String s : spl) {
+		for (String s : spl)
 			t = t.replace(s, "");
-		}
 		return t;
 	}
 
-	public void giveMoney(String money, Player p)
-	{
+	public void giveMoney(String money, Player p, String type) {
 		float amount = Float.parseFloat(money);
-		if (this.pickupMulti.containsKey(p.getUniqueId())) {
-			amount *= ((Integer)this.pickupMulti.get(p.getUniqueId())).intValue();
-		}
-		if ((this.fc.getBoolean("limit.enable")) && 
-				(!this.limit.add(p.getName(), amount)))
-		{
-			sendMessage(p, this.language.get("limit"));
+		if (pickupMulti.containsKey(p.getUniqueId()))
+			amount *= ((Integer)pickupMulti.get(p.getUniqueId())).intValue();
+		if ((fc.getBoolean("limit.enable")) && (!limit.add(p.getName(), amount))) {
+			sendMessage(p, language.get("limit"));
 			return;
 		}
 		economy.depositPlayer(p, amount);
-		sendMessage(p, this.language.get("pickup").replace("{money}", money));
+		if(fc.getBoolean("chatAnnounce." + type))
+			sendMessage(p, language.get("pickup").replace("{money}", money));
 	}
 
-	public float moneyToSteal(float amount, Player p)
-	{
+	public float moneyToSteal(float amount, Player p) {
 		double bal = economy.getBalance(p);
-		if (bal >= amount)
-		{
+		if (bal >= amount) {
 			economy.withdrawPlayer(p, amount);
 			return amount;
 		}
-		if (bal == 0.0D) {
+		if (bal == 0.0D)
 			return 0.0F;
-		}
 		economy.withdrawPlayer(p, bal);
 		return (float)bal;
 	}
 
-	public boolean costMoney(float amount, Player p)
-	{
-		if (economy.getBalance(p) >= amount)
-		{
+	public boolean costMoney(float amount, Player p) {
+		if (economy.getBalance(p) >= amount) {
 			economy.withdrawPlayer(p, amount);
 			return true;
 		}
 		return false;
 	}
 
-	public void spawnMoney(Entity p, float money, Location l)
-	{
-		if ((p != null) && ((p instanceof Player)) && (this.dropMulti.containsKey(p.getUniqueId()))) {
-			money *= ((Integer)this.dropMulti.get(p.getUniqueId())).intValue();
-		}
+	public void spawnMoney(Entity p, float money, Location l) {
+		if (p != null && p instanceof Player && dropMulti.containsKey(p.getUniqueId()))
+			money *= ((Integer)dropMulti.get(p.getUniqueId())).intValue();
 		int r = fc.getInt("collateRadius");
 		for(Entity e : l.getWorld().getNearbyEntities(l, r, r, r))
 			if(e instanceof Item) {
 				Item i = (Item) e;
 				if(i.hasMetadata("droppedMoney")){
-					Float m = Float.valueOf(ChatColor.stripColor(stripCodes(e.getCustomName())).replaceAll("[^0-9.]", ""));
+					Float m = Float.valueOf(ChatColor.stripColor(e.getCustomName()).replaceAll("[^0-9.]", ""));
 					money = Float.sum(money, m);
 					e.removeMetadata("droppedMoney", this);
 					e.remove();
@@ -265,46 +220,42 @@ public final class PickupMoney extends JavaPlugin {
 		Item item = l.getWorld().dropItemNaturally(l, getItem(Float.valueOf(money).floatValue()));
 		String m = getStringOfMoney(money);
 
-		item.setCustomName(this.language.get("nameSyntax").replace("{money}", m));
+		if(p instanceof Monster)
+			item.setMetadata("monster", new FixedMetadataValue(this, true));
+		else if(p instanceof Player)
+			item.setMetadata("player", new FixedMetadataValue(this, true));
+		else
+			item.setMetadata("animal", new FixedMetadataValue(this, true));
+		item.setCustomName(language.get("nameSyntax").replace("{money}", m));
 		item.setCustomNameVisible(true);
 		item.setMetadata("droppedMoney", new FixedMetadataValue(this, true));
 	}
 
-	private String getStringOfMoney(float money)
-	{
-		if (this.fc.getInt("decimalPlace") == 0) {
+	private String getStringOfMoney(float money) {
+		if (fc.getInt("decimalPlace") == 0)
 			return String.valueOf(Math.round(money));
-		}
 		return String.valueOf(money);
 	}
 
-	public void spawnParticle(Location l)
-	{
-		l.getWorld().playEffect(l, Effect.valueOf(this.fc.getString("particle.type")), this.fc.getInt("particle.amount"), 20);
+	public void spawnParticle(Location l) {
+		l.getWorld().playEffect(l, Effect.valueOf(fc.getString("particle.type")), fc.getInt("particle.amount"), 20);
 	}
 
-	public boolean checkWorld(Location location)
-	{
-		if (this.fc.getList("disableWorld").contains(location.getWorld().getName())) {
+	public boolean checkWorld(Location location) {
+		if (fc.getList("disableWorld").contains(location.getWorld().getName()))
 			return false;
-		}
 		return true;
 	}
 
-	public ItemStack getItem(float money)
-	{
+	public ItemStack getItem(float money) {
 		ItemStack item;
-		if (money < this.fc.getDouble("item.small.amount"))
-		{
-			item = new ItemStack(Material.getMaterial(this.fc.getString("item.small.type")), 1);
-		}
-		else
-		{
-			if (money < this.fc.getDouble("item.normal.amount")) {
-				item = new ItemStack(Material.getMaterial(this.fc.getString("item.normal.type")), 1);
-			} else {
-				item = new ItemStack(Material.getMaterial(this.fc.getString("item.big.type")), 1);
-			}
+		if (money < fc.getDouble("item.small.amount")) {
+			item = new ItemStack(Material.getMaterial(fc.getString("item.small.type")), 1);
+		} else {
+			if (money < fc.getDouble("item.normal.amount"))
+				item = new ItemStack(Material.getMaterial(fc.getString("item.normal.type")), 1);
+			else
+				item = new ItemStack(Material.getMaterial(fc.getString("item.big.type")), 1);
 		}
 		ItemMeta meta = item.getItemMeta();
 		List<String> lore = new ArrayList<String>();
@@ -316,107 +267,65 @@ public final class PickupMoney extends JavaPlugin {
 		return item;
 	}
 
-	public void loadConfiguration()
-	{
+	public void loadConfiguration() {
 		getConfig().options().copyDefaults(true);
 		saveConfig();
 		getConfig().options().copyDefaults(false);
 	}
 
-	private void initConfig()
-	{
-		this.fc = getConfig();
-		this.language = new Language(this);
-		this.entities = new Entities(this);
-		this.blocks = new Blocks(this);
-		if (this.fc.getBoolean("limit.enable")) {
-			this.limit = new Limit(this);
-		}
+	private void initConfig() {
+		fc = getConfig();
+		language = new Language(this);
+		entities = new Entities(this);
+		blocks = new Blocks(this);
+		if (fc.getBoolean("limit.enable"))
+			limit = new Limit(this);
 	}
 
-	private boolean setupEconomy()
-	{
+	private boolean setupEconomy() {
 		RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-		if (economyProvider != null) {
+		if (economyProvider != null)
 			economy = economyProvider.getProvider();
-		}
 		return (economy != null);
 	}
 
-	public String getMessage(String type)
-	{
-		return ChatColor.translateAlternateColorCodes('&', this.fc.getString("Message." + type));
+	public String getMessage(String type) {
+		return ChatColor.translateAlternateColorCodes('&', fc.getString("Message." + type));
 	}
 
-	public void sendMessage(CommandSender p, String s)
-	{
-		if ((s == null) || (s.equals(""))) {
+	public void sendMessage(CommandSender p, String s) {
+		if ((s == null) || (s.equals("")))
 			return;
-		}
-		if (this.fc.getBoolean("chatMessage")) {
-			p.sendMessage(s);
-		}
+		p.sendMessage(s);
 	}
 
-	public float round(float d)
-	{
-		int v = this.fc.getInt("decimalPlace");
-		if (v == 0) {
+	public float round(float d) {
+		int v = fc.getInt("decimalPlace");
+		if (v == 0)
 			return Math.round(d);
-		}
 		BigDecimal bd = new BigDecimal(Float.toString(d));
 		bd = bd.setScale(v, 4);
 		return bd.floatValue();
 	}
 
-	public float getMoneyBonus(String val, float bonus, int fortune)
-	{
+	public float getMoneyBonus(String val, float bonus, int fortune) {
 		float money = getRandom(val);
-		if (bonus > 0.0F) {
+		if (bonus > 0.0F)
 			money += money * bonus * fortune;
-		}
 		return round(money);
 	}
 
-	public float getRandom(String level)
-	{
-		if (level.contains("-"))
-		{
+	public float getRandom(String level) {
+		if (level.contains("-")) {
 			String[] spl = level.split("-");
-
 			return round(getRandomFloat(Float.parseFloat(spl[0]), Float.parseFloat(spl[1])));
 		}
 		return Float.parseFloat(level);
 	}
 
-	public float getRandomFloat(float minX, float maxX)
-	{
+	public float getRandomFloat(float minX, float maxX) {
 		Random random = new Random();
 		return ((maxX - minX) * random.nextFloat()) + minX;
 	}
 
-	private String stripCodes(String m){
-		return m
-				.replace("&0", "")
-				.replace("&1", "")
-				.replace("&2", "")
-				.replace("&3", "")
-				.replace("&4", "")
-				.replace("&5", "")
-				.replace("&6", "")
-				.replace("&7", "")
-				.replace("&8", "")
-				.replace("&9", "")
-				.replace("&a", "")
-				.replace("&b", "")
-				.replace("&c", "")
-				.replace("&d", "")
-				.replace("&e", "")
-				.replace("&f", "")
-				.replace("&k", "")
-				.replace("&l", "")
-				.replace("&m", "")
-				.replace("&n", "")
-				.replace("&o", "");
-	}
 }

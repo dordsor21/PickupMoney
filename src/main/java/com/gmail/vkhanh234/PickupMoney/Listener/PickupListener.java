@@ -14,42 +14,34 @@ public class PickupListener implements Listener {
 
 	private final PickupMoney plugin;
 
-	public PickupListener(PickupMoney plugin)
-	{
+	public PickupListener(PickupMoney plugin) {
 		this.plugin = plugin;
 	}
 
 	@EventHandler
-	public void onPickup(PlayerPickupItemEvent e)
-	{
+	public void onPickup(PlayerPickupItemEvent e) {
 		Item item = e.getItem();
-		if (item.getCustomName() != null)
-		{
+		if (item.getCustomName() != null) {
 			ItemMeta meta = item.getItemStack().getItemMeta();
-			if (!meta.hasLore()) {
+			if (!meta.hasLore() || !meta.getLore().contains("PickupMoney"))
 				return;
-			}
-			if (!meta.getLore().contains("PickupMoney")) {
-				return;
-			}
 			Player p = e.getPlayer();
 			e.setCancelled(true);
-			if ((this.plugin.fc.getBoolean("shiftToPickUp")) && (!p.isSneaking())) {
+			if ((plugin.fc.getBoolean("shiftToPickUp")) && (!p.isSneaking()) || plugin.fc.getBoolean("scheduleMode.enable"))
 				return;
-			}
-			if (this.plugin.fc.getBoolean("scheduleMode.enable")) {
-				return;
-			}
 			String name = ChatColor.stripColor(item.getCustomName());
-			String money = this.plugin.getMoney(name);
-			if (p.hasPermission("PickupMoney.pickup"))
-			{
+			String money = plugin.getMoney(name);
+			if (p.hasPermission("PickupMoney.pickup")) {
 				item.remove();
-				this.plugin.giveMoney(money, p);
-				if (this.plugin.fc.getBoolean("sound.enable")) {
-					p.getLocation().getWorld().playSound(p.getLocation(), Sound.valueOf(this.plugin.fc.getString("sound.type")), 
-							(float)this.plugin.fc.getDouble("sound.volumn"), 
-							(float)this.plugin.fc.getDouble("sound.pitch"));
+				String type = "player";
+				if(item.hasMetadata("monster"))
+					type = "monster";
+				else if(item.hasMetadata("animal"))
+					type = "animal";
+				plugin.giveMoney(money, p, type);
+				if (plugin.fc.getBoolean("sound.enable")) {
+					p.getLocation().getWorld().playSound(p.getLocation(), Sound.valueOf(plugin.fc.getString("sound.type")), (float)plugin.fc.getDouble("sound.volumn"), 
+							(float)plugin.fc.getDouble("sound.pitch"));
 				}
 			}
 		}

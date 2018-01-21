@@ -9,14 +9,12 @@ public class MultiplierListener implements Listener {
 
 	private final PickupMoney plugin;
 
-	public MultiplierListener(PickupMoney plugin)
-	{
+	public MultiplierListener(PickupMoney plugin) {
 		this.plugin = plugin;
 	}
 
 	@EventHandler
-	public void onLogin(PlayerJoinEvent e)
-	{
+	public void onLogin(PlayerJoinEvent e) {
 		this.plugin.loadMultiplier(e.getPlayer());
 	}
 }

@@ -14,36 +14,36 @@ public class PickupRunnable extends BukkitRunnable {
 	private final PickupMoney plugin;
 	private final double rad;
 
-	public PickupRunnable(PickupMoney plugin)
-	{
+	public PickupRunnable(PickupMoney plugin) {
 		this.plugin = plugin;
 		this.rad = plugin.fc.getDouble("scheduleMode.radius");
 	}
 
-	public void run()
-	{
+	public void run() {
 
 		Player p;
-		for (Iterator<? extends Player> localIterator1 = Bukkit.getOnlinePlayers().iterator(); localIterator1.hasNext();)
-		{
+		for (Iterator<? extends Player> localIterator1 = Bukkit.getOnlinePlayers().iterator(); localIterator1.hasNext();) {
 			p = (Player)localIterator1.next();
-			if ((!this.plugin.fc.getBoolean("shiftToPickUp")) || (p.isSneaking())) {
-				for (Entity e : p.getNearbyEntities(this.rad, this.rad, this.rad)) {
-					if ((e instanceof Item))
-					{
+			if ((!plugin.fc.getBoolean("shiftToPickUp")) || (p.isSneaking())) {
+				for (Entity e : p.getNearbyEntities(rad, rad, rad)) {
+					if ((e instanceof Item)) {
 						Item item = (Item)e;
-						if (item.getCustomName() != null)
-						{
+						if (item.getCustomName() != null) {
 							String name = ChatColor.stripColor(item.getCustomName());
-							String money = this.plugin.getMoney(name);
-							if (p.hasPermission("PickupMoney.pickup"))
-							{
+							String money = plugin.getMoney(name);
+							if (p.hasPermission("PickupMoney.pickup")) {
+								e.removeMetadata("droppedMoney", plugin);
 								item.remove();
-								this.plugin.giveMoney(money, p);
-								if (this.plugin.fc.getBoolean("sound.enable")) {
-									p.getLocation().getWorld().playSound(p.getLocation(), Sound.valueOf(this.plugin.fc.getString("sound.type")), 
-											(float)this.plugin.fc.getDouble("sound.volumn"), 
-											(float)this.plugin.fc.getDouble("sound.pitch"));
+								String type = "player";
+								if(item.hasMetadata("monster"))
+									type = "monster";
+								else if(item.hasMetadata("animal"))
+									type = "animal";
+								plugin.giveMoney(money, p, type);
+								if (plugin.fc.getBoolean("sound.enable")) {
+									p.getLocation().getWorld().playSound(p.getLocation(), Sound.valueOf(plugin.fc.getString("sound.type")), 
+											(float)plugin.fc.getDouble("sound.volumn"), 
+											(float)plugin.fc.getDouble("sound.pitch"));
 								}
 							}
 						}
