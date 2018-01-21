@@ -295,7 +295,7 @@ public final class PickupMoney extends JavaPlugin {
 			if(e instanceof Item) {
 				Item i = (Item) e;
 				if(i.hasMetadata("droppedMoney")){
-					Float m = Float.valueOf(stripCodes(e.getCustomName()).replaceAll("[^0-9.]", ""));
+					Float m = Float.valueOf(ChatColor.stripColor(stripCodes(e.getCustomName())).replaceAll("[^0-9.]", ""));
 					money = Float.sum(money, m);
 					e.removeMetadata("droppedMoney", this);
 					e.remove();
@@ -486,7 +486,7 @@ public final class PickupMoney extends JavaPlugin {
 	public float getRandomFloat(float minX, float maxX)
 	{
 		Random random = new Random();
-		return (maxX - minX) * random.nextFloat() + minX;
+		return ((maxX - minX) * random.nextFloat()) + minX;
 	}
 
 	private String stripCodes(String m){

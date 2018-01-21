@@ -78,7 +78,7 @@ public class MainListener implements Listener {
 						float money = this.plugin.getMoneyBonus(this.plugin.entities.getMoney(name), bonus, looting);
 						if (e.getEntity().getType().equals(EntityType.ZOMBIE)){
 							Zombie zombie = (Zombie)e.getEntity();
-							Float zMoney = KUtils.getMoneyFromItem(zombie.getEquipment().getItemInHand());
+							Float zMoney = plugin.round(KUtils.getMoneyFromItem(zombie.getEquipment().getItemInHand()));
 							if (zMoney != 0.0F){
 								money += zMoney;
 								e.getDrops().remove(zombie.getEquipment().getItemInHand());
