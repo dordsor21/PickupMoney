@@ -48,6 +48,7 @@ public final class PickupMoney extends JavaPlugin {
 	public Limit limit;
 	ConsoleCommandSender console;
 	private String prefix = "[PickupMoney] ";
+	private String ver = "2.6.0";
 	public List<UUID> spawners = new ArrayList<UUID>();
 
 	public void onEnable() {
@@ -71,6 +72,7 @@ public final class PickupMoney extends JavaPlugin {
 			Class.forName("net.elseland.xikage.MythicMobs.API.Bukkit.Events.MythicMobDeathEvent");
 			getServer().getPluginManager().registerEvents(new MythicMobsListener(this), this);
 		} catch (ClassNotFoundException localClassNotFoundException) {}
+		getLogger().info("Enabled Pickup Money v" + ver);
 	}
 
 	private void loadMultipliers() {
