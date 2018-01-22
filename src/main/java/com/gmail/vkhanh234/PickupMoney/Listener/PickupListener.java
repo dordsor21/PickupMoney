@@ -38,8 +38,10 @@ public class PickupListener implements Listener {
 					type = "monster";
 				else if(item.hasMetadata("animal"))
 					type = "animal";
+				else if(item.hasMetadata("block"))
+					type = "block";
 				plugin.giveMoney(money, p, type);
-				if (plugin.fc.getBoolean("sound.enable")) {
+				if (plugin.fc.getBoolean("soundAnnounce." + type) && plugin.fc.getBoolean("sound.enable")) {
 					p.getLocation().getWorld().playSound(p.getLocation(), Sound.valueOf(plugin.fc.getString("sound.type")), (float)plugin.fc.getDouble("sound.volumn"), 
 							(float)plugin.fc.getDouble("sound.pitch"));
 				}

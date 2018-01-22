@@ -31,6 +31,8 @@ chatAnnounce:
   monster: true
   animal: true
   player: true
+  block: true
+  commandDropped: true
 #
 #This mode will loop through all players and check entities near them to detect the money.
 #Use this mode to be able to pick money up even when inventory is full. But it can cause lag.
@@ -56,7 +58,7 @@ limit:
 #Particle when the money spawned.
 particle:
   enable: true
-  type: happyVillager
+  type: HAPPY_VILLAGER
   amount: 6
 #
 #Sound when the money spawned.

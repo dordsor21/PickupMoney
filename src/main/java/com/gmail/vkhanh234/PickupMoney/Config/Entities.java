@@ -15,7 +15,6 @@ public class Entities {
 	HashMap<String, EntityDat> map = new HashMap<String, EntityDat>();
 
 	public Entities(PickupMoney plugin) {
-		config = YamlConfiguration.loadConfiguration(configFile);
 		try {
 			configFile = new File(plugin.getDataFolder(), "entities.yml");
 

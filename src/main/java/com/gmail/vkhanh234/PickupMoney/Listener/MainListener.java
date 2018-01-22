@@ -8,6 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
@@ -44,7 +45,9 @@ public class MainListener implements Listener {
 							plugin.sendMessage(p, plugin.language.get("dropOut").replace("{money}", String.valueOf(money)));
 						}
 						if (money > 0.0F)
-							plugin.spawnMoney(e.getEntity().getKiller(), money, entity.getLocation());
+							plugin.spawnMoney(e.getEntity().getKiller(), money, entity.getLocation(), "player");
+						if(plugin.fc.getBoolean("particleSpawn.player") && plugin.fc.getBoolean("particle"))
+							plugin.spawnParticle(entity.getLocation());
 					}
 				} else {
 					int perc = 100;
@@ -67,10 +70,14 @@ public class MainListener implements Listener {
 								zombie.getEquipment().setItemInMainHand(new ItemStack(Material.AIR));
 							}
 						}
-						plugin.spawnMoney(e.getEntity().getKiller(), money * perc / 100.0F, entity.getLocation());
+						String type = "animal";
+						if(e.getEntity() instanceof Monster)
+							type = "monster";
+						plugin.spawnMoney(e.getEntity().getKiller(), money * perc / 100.0F, entity.getLocation(), type);
+						if(plugin.fc.getBoolean("particleSpawn." + type) && plugin.fc.getBoolean("particle"))
+							plugin.spawnParticle(entity.getLocation());
 					}
 				}
-				plugin.spawnParticle(entity.getLocation());
 			}
 		}
 	}
@@ -93,9 +100,10 @@ public class MainListener implements Listener {
 				int fortune = KUtils.getPlayerFortune(e.getPlayer());
 				for (int i = 0; i < KUtils.getRandomInt(plugin.blocks.getAmount(name)); i++) {
 					float money = plugin.getMoneyBonus(plugin.blocks.getMoney(name), bonus, fortune);
-					plugin.spawnMoney(e.getPlayer(), money, block.getLocation());
+					plugin.spawnMoney(e.getPlayer(), money, block.getLocation(), "block");
 				}
-				plugin.spawnParticle(block.getLocation());
+				if(plugin.fc.getBoolean("particleSpawn.block") && plugin.fc.getBoolean("particle"))
+					plugin.spawnParticle(block.getLocation());
 			}
 		}
 	}

@@ -5,6 +5,7 @@ import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent;
 import com.gmail.vkhanh234.PickupMoney.KUtils;
 import com.gmail.vkhanh234.PickupMoney.PickupMoney;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,9 +33,13 @@ public class MythicMobsListener implements Listener {
 				for (int i = 0; i < KUtils.getRandomInt(plugin.entities.getAmount(name)); i++) {
 					@SuppressWarnings("unused")
 					float money = plugin.getMoneyBonus(plugin.entities.getMoney(name), bonus, looting);
-					plugin.spawnMoney(e.getKiller(), plugin.getRandom(plugin.entities.getMoney(name)), entity.getLocation());
+					String type = "animal";
+					if(e.getEntity() instanceof Monster)
+						type = "monster";
+					plugin.spawnMoney(e.getKiller(), plugin.getRandom(plugin.entities.getMoney(name)), entity.getLocation(), type);
+					if(plugin.fc.getBoolean("particleSpawn." + type) && plugin.fc.getBoolean("particle"))
+						plugin.spawnParticle(entity.getLocation());
 				}
-				plugin.spawnParticle(entity.getLocation());
 			}
 		}
 	}

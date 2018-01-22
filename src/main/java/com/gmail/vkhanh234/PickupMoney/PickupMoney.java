@@ -28,7 +28,6 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -100,7 +99,7 @@ public final class PickupMoney extends JavaPlugin {
 					Set<Material> set = null;
 					Block b = p.getTargetBlock(set, 6);
 					if (costMoney(money, p))
-						spawnMoney(p, money, b.getLocation());else
+						spawnMoney(p, money, b.getLocation(), "commandDropped");else
 							sendMessage(p, language.get("noMoney"));
 				} else if ((args[0].equals("clearlimit")) && (args.length == 2) && (sender.hasPermission("PickupMoney.admincmd"))) {
 					if (args[1].equals("all"))
@@ -179,7 +178,7 @@ public final class PickupMoney extends JavaPlugin {
 			return;
 		}
 		economy.depositPlayer(p, amount);
-		if(fc.getBoolean("chatAnnounce." + type))
+		if(fc.getBoolean("chatAnnounce." + type) && fc.getBoolean("chatMessage"))
 			sendMessage(p, language.get("pickup").replace("{money}", money));
 	}
 
@@ -203,7 +202,7 @@ public final class PickupMoney extends JavaPlugin {
 		return false;
 	}
 
-	public void spawnMoney(Entity p, float money, Location l) {
+	public void spawnMoney(Entity p, float money, Location l, String type) {
 		if (p != null && p instanceof Player && dropMulti.containsKey(p.getUniqueId()))
 			money *= ((Integer)dropMulti.get(p.getUniqueId())).intValue();
 		int r = fc.getInt("collateRadius");
@@ -220,12 +219,7 @@ public final class PickupMoney extends JavaPlugin {
 		Item item = l.getWorld().dropItemNaturally(l, getItem(Float.valueOf(money).floatValue()));
 		String m = getStringOfMoney(money);
 
-		if(p instanceof Monster)
-			item.setMetadata("monster", new FixedMetadataValue(this, true));
-		else if(p instanceof Player)
-			item.setMetadata("player", new FixedMetadataValue(this, true));
-		else
-			item.setMetadata("animal", new FixedMetadataValue(this, true));
+		item.setMetadata(type, new FixedMetadataValue(this, true));
 		item.setCustomName(language.get("nameSyntax").replace("{money}", m));
 		item.setCustomNameVisible(true);
 		item.setMetadata("droppedMoney", new FixedMetadataValue(this, true));
