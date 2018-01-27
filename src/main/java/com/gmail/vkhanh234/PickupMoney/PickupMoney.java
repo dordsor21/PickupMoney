@@ -18,9 +18,9 @@ import java.util.Set;
 import java.util.UUID;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
-import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -31,6 +31,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -234,7 +235,14 @@ public final class PickupMoney extends JavaPlugin {
 	}
 
 	public void spawnParticle(Location l) {
-		l.getWorld().playEffect(l, Effect.valueOf(fc.getString("particle.type")), fc.getInt("particle.amount"), 20);
+		Particle p = Particle.valueOf(fc.getString("particle.type"));
+		Class<?> dataType = p.getDataType();
+		if(dataType == Void.class)
+			l.getWorld().spawnParticle(p, l, fc.getInt("particle.amount"));
+		else if(dataType == MaterialData.class)
+			l.getWorld().spawnParticle(p, l, fc.getInt("particle.amount"), new MaterialData(Material.valueOf(fc.getString("particle.data"))));
+		else
+			l.getWorld().spawnParticle(p, l, fc.getInt("particle.amount"), new ItemStack(Material.valueOf(fc.getString("particle.data"))));
 	}
 
 	public boolean checkWorld(Location location) {

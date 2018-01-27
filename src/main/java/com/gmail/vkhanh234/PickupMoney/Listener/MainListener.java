@@ -46,7 +46,7 @@ public class MainListener implements Listener {
 						}
 						if (money > 0.0F)
 							plugin.spawnMoney(e.getEntity().getKiller(), money, entity.getLocation(), "player");
-						if(plugin.fc.getBoolean("particleSpawn.player") && plugin.fc.getBoolean("particle"))
+						if(plugin.fc.getBoolean("particleSpawn.player") && plugin.fc.getBoolean("particle.enable"))
 							plugin.spawnParticle(entity.getLocation());
 					}
 				} else {
@@ -74,7 +74,7 @@ public class MainListener implements Listener {
 						if(e.getEntity() instanceof Monster)
 							type = "monster";
 						plugin.spawnMoney(e.getEntity().getKiller(), money * perc / 100.0F, entity.getLocation(), type);
-						if(plugin.fc.getBoolean("particleSpawn." + type) && plugin.fc.getBoolean("particle"))
+						if(plugin.fc.getBoolean("particleSpawn." + type) && plugin.fc.getBoolean("particle.enable"))
 							plugin.spawnParticle(entity.getLocation());
 					}
 				}
